@@ -1,822 +1,244 @@
 <div align="center">
-
-<img src="images/logo.png" width="140"/>
-
-# Olist E-Commerce Intelligence Platform
-
-### End-to-End Analytics Engineering Case Study
-
-Designing a modern Medallion data warehouse using Databricks, dbt, Spark SQL, Apache Airflow (Astronomer), Docker, and Power BI to transform operational e-commerce data into business-ready analytical models.
-
-<br>
-
-![Status](https://img.shields.io/badge/Status-Completed-success)
-![Architecture](https://img.shields.io/badge/Architecture-Medallion-blue)
-![Warehouse](https://img.shields.io/badge/Warehouse-Star%20Schema-orange)
-![Transformation](https://img.shields.io/badge/dbt-Core-FF694B)
-![Platform](https://img.shields.io/badge/Platform-Databricks-EF3E42)
-![SQL](https://img.shields.io/badge/SQL-Spark_SQL-blue)
-![Orchestration](https://img.shields.io/badge/Orchestration-Apache_Airflow-017CEE)
-![Container](https://img.shields.io/badge/Container-Docker-2496ED)
-![Visualization](https://img.shields.io/badge/Visualization-Power_BI-F2C811)
-
-<br>
-
-[Project Documentation](docs/) •
-[Architecture](docs/project_architecture.md) •
-[Data Model](docs/data_model.md) •
-[Data Dictionary](docs/data_dictionary.md) •
-[Data Quality](docs/data_quality.md) •
-[Setup Guide](SETUP.md)
-
+  <img width="140px" src="images/logo.png" alt="Olist E-Commerce Intelligence logo — swap for your own" />
 </div>
 
----
+<h1 align="center">Olist E-Commerce Intelligence Platform</h1>
+<h3 align="center">Diagnostic Report — Why 80% of O-List's Customers Never Come Back</h3>
 
-# Executive Summary
+<p align="center">
+  <img alt="status" src="https://img.shields.io/badge/status-portfolio_case_study-1E56C7">
+  <img alt="data" src="https://img.shields.io/badge/data-real_%E2%80%94_olist_brazilian_ecommerce-8B98AE">
+  <img alt="stack" src="https://img.shields.io/badge/stack-databricks_%7C_dbt_%7C_airflow_%7C_power_bi-1E56C7">
+  <img alt="scale" src="https://img.shields.io/badge/orders-99441_%7C_sellers-3095-12A879">
+</p>
 
-Modern analytics teams require more than dashboards. They require reliable data pipelines, governed transformation logic, validated analytical models, and business focused reporting that stakeholders can trust.
-
-This project demonstrates an end-to-end Analytics Engineering workflow using the publicly available Olist Brazilian E-Commerce dataset. The objective was to transform raw operational data into a governed analytical warehouse following modern data engineering practices.
-
-The solution implements a Medallion Architecture using Databricks as the development platform, dbt Core for SQL transformations, Spark SQL for model development, Apache Airflow (Astronomer Runtime) for orchestration, Docker for local execution, and Power BI for business reporting.
-
-Rather than treating the dataset as a visualization exercise, the project focuses on designing reusable data models, enforcing data quality, documenting transformation logic, and delivering analytical marts that support business decision making.
-
----
-
-# Business Context
-
-E-commerce organizations generate large volumes of operational data across customers, orders, products, payments, logistics, sellers, and customer reviews.
-
-Although these datasets contain valuable business information, they are optimized for transactional processing rather than analytical reporting.
-
-Typical challenges include:
-
-* Data spread across multiple operational tables.
-* Inconsistent naming conventions.
-* Limited business friendly structures.
-* Complex joins required for reporting.
-* Repeated transformation logic across dashboards.
-* Lack of centralized data quality validation.
-
-These issues increase development effort while reducing confidence in analytical outputs.
-
-The objective of this project is to solve those challenges by designing a modern analytics warehouse that provides clean, reusable, and business-oriented datasets.
+<p align="center"><b>Saswata Ghosh</b> · Data Analyst / Analytics Engineer<br>
+<a href="https://github.com/Saswataghosh06/Olist-Ecommerce-Intelligence">GitHub Repo</a> · <a href="#">LinkedIn</a> · <a href="#">Email</a></p>
 
 ---
 
-# Project Objectives
+## 1. Problem
 
-The project was designed around four primary objectives.
+O-List looks like an acquisition success on paper — nearly 100,000 orders, over $15.8M in platform revenue, a real seller network. But 8 out of every 10 customers who buy once never buy again, and platform-wide, zero customers currently qualify as repeat or VIP buyers under standard RFM segmentation.
 
-## 1. Build a Modern Analytics Warehouse
+That's not a top-of-funnel problem. Something after checkout — delivery, seller quality, or both — is breaking the relationship before it starts.
 
-Develop a layered Medallion Architecture that separates raw ingestion, standardized transformations, dimensional modeling, and business reporting.
+## 2. Background & Overview
 
-## 2. Implement Analytics Engineering Best Practices
+I treated this the way I'd treat a first week on a new client engagement: don't trust any existing summary of the business, rebuild the data model from raw CSVs, validate every join, and only then start forming opinions.
 
-Use dbt to create modular SQL models, reusable transformations, lineage documentation, and automated testing.
+Olist is a real Brazilian marketplace connecting small sellers to major retail channels. The public dataset covers orders across 2016–2018 — customers, sellers, products, payments, reviews, and geolocation, spread across nine source tables.
 
-## 3. Deliver Business Ready Data Models
+I ingested the raw CSVs into a Databricks Bronze layer, modeled them into a Silver star schema and Gold business marts using dbt Core, orchestrated the pipeline with Apache Airflow, and ran the business EDA directly in a Databricks notebook before opening any BI tool. The dashboard came last, once the numbers already told a story.
 
-Create conformed dimensions, fact tables, and analytical marts that support reporting across multiple business domains.
+## 3. Objective
 
-## 4. Produce Actionable Business Insights
+**The question this project answers:**
 
-Use Power BI to analyze customer behavior, seller performance, logistics operations, and overall marketplace performance.
+> *If O-List is good enough at getting a first order, why can't it get a second one — and which part of the operation is actually responsible?*
 
----
+That question touches product, logistics, seller quality, and finance at once, so the analysis was built to hold up under any of those lenses, not just one.
 
-# Project Scope
+## 4. Data Structure & Initial Checks
 
-This project covers the complete analytical workflow from raw source data to executive reporting.
+Medallion Architecture (Bronze → Silver → Gold) with a star schema in Silver: 4 conformed dimensions, 3 fact tables, feeding 3 Gold marts.
 
-The implementation includes:
+**Source layer (Bronze):**
 
-* Bronze data ingestion
-* Medallion Architecture
-* dbt transformation framework
-* Star Schema dimensional modeling
-* Data quality validation
-* Data auditing
-* Business marts
-* Apache Airflow orchestration
-* Power BI dashboards
-* Complete technical documentation
+| Dataset | Rows | Columns |
+|---|---:|---:|
+| olist_geolocation_dataset | 1,000,163 | 5 |
+| olist_order_items_dataset | 112,650 | 7 |
+| olist_order_payments_dataset | 103,886 | 5 |
+| olist_customers_dataset | 99,441 | 5 |
+| olist_orders_dataset | 99,441 | 8 |
+| olist_order_reviews_dataset | 99,224 | 7 |
+| olist_products_dataset | 32,951 | 9 |
+| olist_sellers_dataset | 3,095 | 4 |
+| product_category_name_translation | 71 | 2 |
 
----
+**Gold-layer entity counts (verified directly from mart exports):**
 
-# Business Questions
+| Entity | Count |
+|---|---:|
+| Unique orders (`fct_orders`) | 99,441 |
+| Order-line rows (`fct_order_items`, multi-seller orders create extra rows) | 100,785 |
+| Unique sellers (`mart_seller_performance`) | 3,095 |
+| Customers segmented in RFM (`mart_customer_rfm`) | 96,478 |
+| Delivered orders | 97,819 (97.1%) |
+| Orders with a missing review score | 782 |
 
-The analytical models were designed to answer business questions across multiple operational domains.
+**Data quality resolutions applied in staging** (full detail in `docs/data_audit.md`):
 
-## Customer Analytics
+| Check | Result |
+|---|---|
+| Schema validation across all 9 raw tables | Passed — no unsupported types, no corrupted files |
+| Customer, seller, payment, translation tables | 0% null |
+| Product category nulls | 1.85%, resolved via `COALESCE(..., 'unknown')` in staging |
+| Order Items — no single-column PK | Resolved with an MD5 surrogate key (`order_item_key`) |
+| Geolocation — duplicate ZIP rows | Resolved via `AVG(lat/lng)` grouped by ZIP |
+| Review text sparsity | 88.34% null on title/message; numeric scores 100% complete |
 
-* Which customers generate the highest long-term value?
-* Which customers are becoming inactive?
-* How can customers be segmented using RFM analysis?
+## 5. Executive Summary
 
-## Sales Performance
+| Metric | Value |
+|---|---:|
+| Total platform revenue | $15,843,553.24 |
+| Total freight collected | $2,251,909.54 |
+| Total product revenue | $13,591,643.70 |
+| Average order value | $162.37 |
+| One-off customers (never returned) | 77,737 (80.57%) |
+| Repeat / VIP customers | 0 (0%) |
+| Platform-wide SLA breach rate | 7.78% |
+| Review score — on-time deliveries | 4.20 ★ (avg. of 92,324 orders) |
+| Review score — late deliveries | 2.57 ★ (avg. of 7,679 orders) |
+| Revenue ↔ review-score correlation (seller level) | 0.0206 (effectively none) |
+| Freight ↔ review-score correlation (seller level) | -0.0759 (weak) |
 
-* How do order volumes change over time?
-* Which product categories generate the highest revenue?
-* How do payment methods vary across purchases?
+**Headline finding:** O-List doesn't have a demand problem, it has a delivery problem. When a delivery arrives on time, customers leave a 4.20-star review on average. When it's late, that collapses to 2.57. Late deliveries hit 7.78% of all orders platform-wide — and 8 in 10 customers never place a second order. Revenue and seller quality are statistically almost unrelated (0.0206 correlation), which means the platform's leaderboard is structurally blind to sellers who generate real revenue while quietly destroying retention.
 
-## Seller Analytics
+## 6. Insights Deep Dive
 
-* Which sellers generate the highest revenue?
-* Which sellers fulfill the largest number of orders?
-* How do customer review scores differ across sellers?
+### 6.1 The Retention Cliff (RFM Segmentation)
 
-## Logistics Analytics
+| Segment | Customers | Share |
+|---|---:|---:|
+| One-Off (single purchase, never returned) | 77,737 | 80.57% |
+| New Customer (too recent to classify) | 18,741 | 19.43% |
+| Repeat / VIP | 0 | 0.00% |
 
-* What is the actual delivery time compared to the estimated delivery time?
-* Which states experience the largest delivery delays?
-* How frequently are deliveries completed after the promised date?
+Out of 96,478 segmented customers, none currently qualify as repeat buyers. O-List's acquisition engine works; nothing downstream of the first order is bringing anyone back.
 
----
+### 6.2 Delivery Timing Is the Single Clearest Driver of Satisfaction
 
-# Repository Highlights
+| Delivery status | Orders | Avg. review score |
+|---|---:|---:|
+| On-time | 92,324 | 4.20 ★ |
+| Late | 7,679 | 2.57 ★ |
 
-| Capability | Status |
-|------------|--------|
-| Medallion Architecture | ✓ |
-| Star Schema Modeling | ✓ |
-| dbt Modular Transformations | ✓ |
-| Spark SQL Models | ✓ |
-| Automated Data Quality Tests | ✓ |
-| Apache Airflow Orchestration | ✓ |
-| Docker Deployment | ✓ |
-| Power BI Reporting | ✓ |
-| Technical Documentation | ✓ |
+A late delivery costs the platform 1.63 stars on average — nearly two full points on a 5-point scale. Platform-wide, **7.78%** of all orders breach their estimated delivery date.
 
----
+### 6.3 SLA Breach Rate by Customer State — Where Delivery Actually Fails
 
-# Solution Architecture
+**Worst 5 states:**
 
-The project follows a layered Medallion Architecture that separates raw ingestion from business-ready analytical models. Each layer has a single responsibility, making the pipeline easier to maintain, test, document, and extend.
+| State | Orders | SLA Breach Rate | Avg. Review Score |
+|---|---:|---:|---:|
+| AL — Alagoas | 415 | 22.89% | 3.76 |
+| MA — Maranhão | 759 | 18.71% | 3.74 |
+| PI — Piauí | 497 | 15.29% | 3.91 |
+| CE — Ceará | 1,347 | 14.55% | 3.85 |
+| SE — Sergipe | 353 | 14.45% | 3.80 |
 
-```
-                                Olist Public Dataset
-                                        │
-                                        ▼
-                         Databricks Community Edition
-                                        │
-                                        ▼
-                          Bronze Layer (Raw Source Tables)
-                                        │
-                                        ▼
-                    dbt Staging Models (Standardization Layer)
-                                        │
-                                        ▼
-               Silver Layer (Dimensions & Fact Tables)
-                                        │
-                                        ▼
-                     Gold Layer (Business Data Marts)
-                                        │
-                                        ▼
-                              Power BI Dashboards
-```
+**Best 5 states:**
 
----
+| State | Orders | SLA Breach Rate | Avg. Review Score |
+|---|---:|---:|---:|
+| RO — Rondônia | 256 | 2.73% | 4.04 |
+| AC — Acre | 81 | 3.70% | 4.05 |
+| AM — Amazonas | 148 | 4.05% | 4.21 |
+| AP — Amapá | 68 | 4.41% | 4.19 |
+| PR — Paraná | 5,109 | 4.82% | 4.16 |
 
-# Technology Stack
+All five worst-performing states sit in Brazil's North/Northeast, and their SLA breach rates run 3–8× higher than the best-performing states. This lines up directly with Section 6.2 — states with the worst delivery reliability also carry visibly lower average review scores.
 
-| Layer | Technology | Purpose |
-|--------|------------|---------|
-| Data Source | Olist Brazilian E-Commerce Dataset | Raw operational data |
-| Development Platform | Databricks Community Edition | Data engineering workspace |
-| Storage | Delta Lake | Bronze data storage |
-| Transformation | dbt Core | SQL transformation framework |
-| SQL Engine | Spark SQL | Data modeling and transformations |
-| Workflow Orchestration | Apache Airflow (Astronomer Runtime) | Pipeline scheduling and orchestration |
-| Containerization | Docker | Local Airflow execution |
-| Version Control | Git & GitHub | Source code management |
-| Business Intelligence | Power BI | Interactive reporting and analytics |
+### 6.4 Seller Concentration Risk — Revenue Says Nothing About Quality
 
----
+| Metric | Seller #1 (4869f7a5…) | Seller #2 (7c67e144…) |
+|---|---:|---:|
+| Revenue | $249,640.70 | $239,536.44 |
+| Orders fulfilled | 1,132 | 982 |
+| Avg. review score | 4.12 ★ | 3.34 ★ |
+| Freight per order | $17.82 | $52.56 |
 
-# Engineering Design Decisions
+O-List's #2 seller by revenue is nearly tied with #1 in dollar terms but carries a review score almost a full star lower, and charges roughly **3× the freight per order** of the #1 seller. Across all 3,095 sellers, the correlation between revenue and review score is **0.0206** — essentially zero. A seller's dollar volume tells you nothing about whether they're a retention risk.
 
-This project intentionally follows modern Analytics Engineering practices rather than building SQL scripts directly against raw tables.
+*Freight comparison note: Seller #1's freight/order ($17.82) is the closest "typical top-seller" figure in this dataset — treat it as an approximate benchmark, not a formal average across the full top-5 cohort, since freight per order varies by product category and weight.*
 
-| Decision | Reason |
-|----------|--------|
-| Medallion Architecture | Separates ingestion, transformation, and reporting responsibilities. |
-| Star Schema | Simplifies analytical queries and improves reporting performance. |
-| dbt Core | Provides modular SQL development, lineage, documentation, and testing. |
-| Spark SQL | Native SQL execution within Databricks. |
-| Apache Airflow | Automates pipeline execution and manages task dependencies. |
-| Docker | Creates a reproducible execution environment for Airflow. |
-| Power BI | Enables interactive business reporting using curated analytical models. |
+### 6.5 Freight and Dissatisfaction Are Weakly Linked at the Portfolio Level, Strongly Linked at the Outlier Level
 
----
+Portfolio-wide, the correlation between a seller's freight-per-order and their average review score is **-0.0759** — weak, on its own not a strong signal. But Seller #2 sits at the extreme end of both axes simultaneously: 3× the freight of comparable top sellers, and the lowest review score in the top-5 revenue cohort. The weak aggregate correlation doesn't rule out concentrated damage from specific outlier sellers — it just means the effect doesn't show up until you segment.
 
-# Data Pipeline
+## 7. Recommendations
 
-The analytical workflow transforms operational datasets into reusable business assets through several processing stages.
+Prioritized the way a real budget cycle would triage them.
 
-## Step 1. Raw Data Ingestion
+**Do first — low effort, high impact**
+- Flag and review any high-volume seller whose average review score drops below 3.5, regardless of revenue rank (directly catches sellers like #2)
+- Launch a post-purchase retention flow (second-order discount, loyalty nudge) targeted at the 77,737 One-Off segment
+- Audit freight pricing on outlier sellers whose freight/order sits multiples above comparable peers
 
-The original Olist datasets are loaded into Databricks without modification.
+**Next — bigger lift, still high value**
+- Investigate root cause of delivery failure in AL, MA, PI, CE, and SE specifically — carrier assignment, warehouse distance, and last-mile partner coverage in these states
+- Build a seller scorecard combining review score, SLA performance, and freight ratio — not revenue alone — into internal seller rankings
+- Track RFM segmentation as a rolling monthly metric so retention becomes a visible, owned KPI
 
-This layer preserves the source data exactly as received and acts as the immutable foundation for all downstream processing.
+**Longer horizon**
+- Pilot regional carrier partnerships for the Northeast, where national-flat-rate logistics is clearly underperforming
+- Re-run this freight-by-geography analysis once order-item-level freight data (split by customer state) is available, to confirm or refute the cost side of the Northeast pattern with full precision
+- Build automated seller probation triggers tied to the review/revenue divergence identified in 6.4
 
-Output:
+**The through-line:** the biggest lever isn't more acquisition spend — it's fixing a delivery-reliability gap concentrated in five states and a small number of outlier sellers, both of which are currently invisible to any dashboard that stops at revenue.
 
-```
-Bronze Tables
-```
-
----
-
-## Step 2. Data Standardization
-
-dbt staging models standardize the raw datasets by applying lightweight transformations.
-
-These include:
-
-* Standardized naming conventions
-* Data type standardization
-* Basic null handling
-* Derived helper columns
-* Geographic standardization
-* Translation lookup preparation
-
-Business logic is intentionally kept minimal within this layer.
-
-Output:
-
-```
-Staging Views
-```
-
----
-
-## Step 3. Dimensional Modeling
-
-The standardized staging models are transformed into reusable analytical models following a Star Schema.
-
-Dimensions contain descriptive business entities.
-
-Facts capture measurable business events.
-
-Output:
-
-```
-Dimensions
-
-• dim_customers
-• dim_date
-• dim_products
-• dim_sellers
-
-Facts
-
-• fct_orders
-• fct_order_items
-• fct_payments
-```
-
----
-
-## Step 4. Business Marts
-
-Business marts aggregate the dimensional models into subject-specific analytical datasets.
-
-Each mart is designed to answer a specific business domain.
-
-Current marts include:
-
-* Customer RFM Analysis
-* Logistics Performance
-* Seller Performance
-
-These marts provide optimized datasets for Power BI reporting.
-
----
-
-# dbt Project Structure
-
-The dbt project follows a modular architecture that separates staging models from reusable analytical models.
-
-```
-models/
-
-├── staging/
-│
-├── dimensions/
-│
-├── facts/
-│
-└── marts/
-```
-
-Each layer depends only on the previous layer, producing a clear and traceable transformation lineage.
-
----
-
-# Data Model
-
-The analytical warehouse follows a Star Schema.
-
-Dimensions describe business entities.
-
-Fact tables capture business events.
-
-Business marts aggregate those facts into reporting-ready datasets.
+## 8. Tech Stack, Architecture & Code
 
 <div align="center">
-
-**[PLACEHOLDER FOR ENTITY RELATIONSHIP DIAGRAM]**
-
+<img width="900" src="images/architecture_diagram.png" alt="Bronze to Silver to Gold pipeline architecture" />
+<br><sub>CSV → Databricks Volumes (Bronze) → dbt staging → Silver star schema → Gold marts → Power BI</sub>
 </div>
-
-The complete schema documentation is available in:
-
-```
-docs/data_model.md
-```
-
----
-
-# dbt Lineage
-
-One of the primary advantages of dbt is automatic dependency tracking.
-
-Every model explicitly references upstream models using `ref()` or `source()`, allowing dbt to generate a complete transformation lineage.
-
-This makes model dependencies transparent while simplifying impact analysis and maintenance.
 
 <div align="center">
-
-**[PLACEHOLDER FOR dbt LINEAGE GRAPH]**
-
+<img width="900" src="images/lineage_graph.png" alt="dbt lineage graph, bronze sources to gold marts" />
 </div>
 
----
+| Layer | Tool | Notes |
+|---|---|---|
+| Raw storage | Databricks Volumes (Bronze) | Immutable CSV ingestion |
+| Warehouse | Databricks Lakehouse (Unity Catalog) | Delta tables across bronze/silver/gold schemas |
+| Transformation | dbt Core | Staging → intermediate (star schema) → marts, with YAML-based tests |
+| Orchestration | Apache Airflow | `dbt_debug` → `dbt_build` DAG |
+| Governance | dbt schema tests | `unique`, `not_null`, `accepted_values`, `relationships` |
+| Business EDA | Databricks notebook (SQL/Python) | RFM, correlation analysis, and SLA breakdowns run before any dashboard was built |
+| Reporting | Power BI | Built on top of the Gold marts |
 
-# Apache Airflow Orchestration
-
-The transformation workflow is orchestrated using Apache Airflow running on the Astronomer Runtime inside Docker.
-
-The pipeline executes tasks in dependency order, ensuring that downstream models are built only after prerequisite transformations complete successfully.
-
-Typical pipeline flow:
-
-```
-Initialize Environment
-
-        │
-
-        ▼
-
-Run dbt Models
-
-        │
-
-        ▼
-
-Execute dbt Tests
-
-        │
-
-        ▼
-
-Pipeline Complete
-```
-
-<div align="center">
-
-**[PLACEHOLDER FOR AIRFLOW DAG SCREENSHOT]**
-
-</div>
-
----
-
-# Repository Structure
-
-The repository is organized to separate source code, documentation, transformation logic, orchestration, and reporting assets.
+**Repository structure:**
 
 ```
-project-root/
-
-├── airflow/
-├── dbt/
+Olist-Ecommerce-Intelligence/
+├── airflow_orchestration/
+│   ├── dags/dbt_pipeline.py
+│   ├── Dockerfile
+│   └── requirements.txt
+├── dbt_transformation/olist_analytics/
+│   ├── models/{staging, intermediate, marts}
+│   ├── seeds/
+│   ├── snapshots/
+│   ├── tests/
+│   └── dbt_project.yml
 ├── docs/
+├── notebooks/01_raw_data_profiling.ipynb
 ├── images/
-├── powerbi/
-├── README.md
-├── SETUP.md
-├── CONTRIBUTING.md
-└── LICENSE
+└── README.md
 ```
 
-A detailed explanation of every directory is available in:
+**Full technical documentation:**
 
-```
-docs/project_structure.md
-```
+| Document | What's in it |
+|---|---|
+| [`docs/data_dictionary.md`](./docs/data_dictionary.md) | Column-level lineage from raw source to every staging, dimension, and fact model |
+| [`docs/data_audit.md`](./docs/data_audit.md) | Full data quality audit — nulls, schema validation, resolution logic per table |
+| [`docs/project_structure.md`](./docs/project_structure.md) | Repository layout and folder responsibilities |
+| [`docs/project_architecture.md`](./docs/project_architecture.md) | Pipeline architecture and Airflow DAG design |
 
----
+## 9. Caveats & Assumptions
 
-# Technical Documentation
-
-Complete project documentation is maintained separately from this README to keep the overview concise.
-
-| Document | Description |
-|----------|-------------|
-| Project Overview | Business context and project scope |
-| Project Architecture | Pipeline architecture and engineering decisions |
-| Project Structure | Repository organization |
-| Data Model | Star schema and relationships |
-| Data Dictionary | Model and column definitions |
-| Data Audit | Raw versus transformed data validation |
-| Data Quality | Data quality framework and validation checks |
-| Setup Guide | Local project installation instructions |
-
-Each document can be found inside the `docs` directory.
-
-# Data Quality & Validation
-
-Reliable business insights depend on reliable data. Before building analytical models, the data pipeline applies validation checks to ensure the transformed datasets are structurally consistent and suitable for reporting.
-
-The project uses multiple validation layers throughout the Medallion Architecture.
-
-* Source level validation
-* Transformation level validation
-* Model level validation
-* Business rule validation
-
-The complete validation methodology is documented in:
-
-```
-docs/data_quality.md
-```
-
-A detailed comparison between the raw source data and transformed analytical models is available in:
-
-```
-docs/data_audit.md
-```
+- **This is real, historical data (2016–2018)**, not synthetic. It reflects Olist's operating conditions in that window, not current-day performance.
+- **The RFM denominator (96,478) is smaller than total unique customers in the order fact (99,441).** This is expected — RFM segmentation excludes customers whose only orders were canceled or unavailable, per the mart's own logic — but it's worth stating plainly rather than treating the two counts as interchangeable.
+- **State-level freight-only figures are not included in this version.** The available exports split freight by seller, not by customer state, so a per-state freight table couldn't be verified against the source data. The SLA-breach-by-state table (Section 6.3) is fully verified and carries the geographic argument in its place.
+- **Correlation is not causation.** The revenue-review (0.0206) and freight-review (-0.0759) figures are weak at the full-portfolio level; the outlier pattern in Section 6.5 is a segmented finding, not a platform-wide statistical relationship.
+- **SLA breach rate (7.78%) is computed across all orders**, including non-delivered ones (canceled, unavailable, etc.), which are not flagged late. Measured only against delivered orders, the rate is 8.02% — both are defensible; this README uses the all-orders figure for consistency with the original notebook analysis.
+- **This reflects one analysis pass on a static dataset.** A production version would track SLA breach and RFM segmentation as rolling metrics, not a single snapshot.
 
 ---
 
-# Business Data Marts
-
-The Gold layer contains subject-oriented analytical marts designed for reporting and business decision making.
-
-Unlike fact tables, these marts contain business-ready metrics that minimize transformation logic inside Power BI.
-
----
-
-## Customer RFM Mart
-
-### Purpose
-
-Provides customer segmentation using the RFM (Recency, Frequency, Monetary) methodology.
-
-### Business Questions
-
-* Which customers purchase most frequently?
-* Which customers generate the highest revenue?
-* Which customers are becoming inactive?
-* How should customers be segmented for retention strategies?
-
-### Primary Metrics
-
-* Recency
-* Frequency
-* Monetary Value
-* Customer Segment
-
----
-
-## Logistics Performance Mart
-
-### Purpose
-
-Provides operational delivery performance across customers, sellers, and logistics operations.
-
-### Business Questions
-
-* How long does delivery actually take?
-* How accurate are estimated delivery dates?
-* Which deliveries arrive late?
-* How do delivery delays influence customer reviews?
-
-### Primary Metrics
-
-* Actual Delivery Days
-* Estimated Delivery Days
-* Late Delivery Flag
-* Order Value
-* Average Review Score
-
----
-
-## Seller Performance Mart
-
-### Purpose
-
-Measures seller operational performance and commercial contribution.
-
-### Business Questions
-
-* Which sellers generate the highest revenue?
-* Which sellers fulfill the largest number of orders?
-* Which sellers receive the highest customer ratings?
-
-### Primary Metrics
-
-* Orders Fulfilled
-* Items Sold
-* Product Revenue
-* Freight Revenue
-* Total Revenue
-* Average Review Score
-
----
-
-# Power BI Dashboard
-
-The analytical marts are consumed by Power BI to provide interactive business reporting.
-
-The dashboard is organized into multiple business domains to support operational and commercial decision making.
-
-Current report pages include:
-
-* Executive Overview
-* Customer Analytics
-* Seller Performance
-* Logistics Performance
-
-<div align="center">
-
-**[PLACEHOLDER FOR POWER BI OVERVIEW DASHBOARD]**
-
-</div>
-
----
-
-<div align="center">
-
-**[PLACEHOLDER FOR CUSTOMER ANALYTICS DASHBOARD]**
-
-</div>
-
----
-
-<div align="center">
-
-**[PLACEHOLDER FOR SELLER PERFORMANCE DASHBOARD]**
-
-</div>
-
----
-
-<div align="center">
-
-**[PLACEHOLDER FOR LOGISTICS PERFORMANCE DASHBOARD]**
-
-</div>
-
----
-
-# Project Documentation
-
-The repository contains comprehensive technical documentation describing every stage of the project.
-
-| Document | Description |
-|----------|-------------|
-| `project_overview.md` | Business context, objectives, and project scope |
-| `project_architecture.md` | End-to-end pipeline architecture |
-| `project_structure.md` | Repository organization |
-| `data_model.md` | Star schema and model relationships |
-| `data_dictionary.md` | Detailed model and column definitions |
-| `data_audit.md` | Raw versus transformed data comparison |
-| `data_quality.md` | Validation framework and quality checks |
-| `SETUP.md` | Local installation and execution guide |
-
----
-
-# Skills Demonstrated
-
-This project demonstrates practical experience across the Analytics Engineering lifecycle.
-
-### Data Engineering
-
-* Data ingestion
-* Data transformation
-* Medallion Architecture
-* ETL pipeline design
-* Workflow orchestration
-
-### Analytics Engineering
-
-* dbt Core
-* Modular SQL development
-* Star Schema design
-* Dimensional modeling
-* Data lineage
-* Documentation
-* Data quality validation
-
-### Analytics
-
-* Customer segmentation
-* Seller performance analysis
-* Logistics analytics
-* KPI development
-* Executive reporting
-
-### Business Intelligence
-
-* Power BI
-* Interactive dashboards
-* Executive reporting
-* Business KPI design
-
----
-
-# Repository Highlights
-
-✔ End-to-end analytics engineering project
-
-✔ Medallion Architecture implementation
-
-✔ Star Schema dimensional warehouse
-
-✔ Modular dbt project
-
-✔ Spark SQL transformations
-
-✔ Apache Airflow orchestration
-
-✔ Dockerized execution environment
-
-✔ Automated data quality validation
-
-✔ Comprehensive technical documentation
-
-✔ Business-ready Power BI reporting
-
----
-# Business Impact
-
-The objective of this project extends beyond building a modern analytics stack. The warehouse is designed to transform raw operational data into trusted analytical assets that support informed business decisions.
-
-By combining dimensional modeling, governed transformations, and interactive reporting, the platform enables stakeholders to monitor marketplace performance across customers, sellers, logistics operations, payments, and products from a single analytical source.
-
-The resulting warehouse reduces repetitive reporting logic, improves data consistency, and provides reusable datasets for future analytical initiatives.
-
----
-
-# Key Learnings
-
-Developing this project provided practical experience across multiple areas of Analytics Engineering.
-
-### Data Engineering
-
-* Designing a Medallion Architecture using Databricks.
-* Working with Delta Lake tables.
-* Managing layered data transformations.
-
-### Analytics Engineering
-
-* Building modular dbt projects.
-* Creating reusable staging, dimension, fact, and mart models.
-* Applying dimensional modeling principles.
-* Documenting models through comprehensive technical documentation.
-* Developing reusable SQL transformations.
-
-### Workflow Orchestration
-
-* Building Apache Airflow DAGs using the Astronomer Runtime.
-* Running Airflow locally through Docker.
-* Managing task dependencies and execution order.
-* Automating dbt model execution and testing.
-
-### Business Intelligence
-
-* Designing business-focused analytical marts.
-* Developing interactive Power BI dashboards.
-* Creating reusable KPIs and executive reporting.
-
----
-
-# Future Enhancements
-
-The current implementation establishes a strong analytical foundation while leaving opportunities for future improvements.
-
-Potential enhancements include:
-
-* Incremental dbt models for faster pipeline execution.
-* dbt snapshots for Slowly Changing Dimensions.
-* CI/CD integration using GitHub Actions.
-* Automated documentation deployment.
-* Cloud deployment on Azure, AWS, or GCP.
-* Data observability and monitoring.
-* Semantic layer implementation.
-* Real-time ingestion using streaming pipelines.
-* Automated alerting for failed pipeline executions.
-
----
-
-# How to Run This Project
-
-Detailed setup instructions are available in:
-
-```
-SETUP.md
-```
-
-The guide includes:
-
-* Environment setup
-* Databricks configuration
-* dbt installation
-* Docker installation
-* Astronomer Runtime setup
-* Apache Airflow execution
-* Power BI connection
-* Pipeline execution
-
----
-
-# Repository Documentation
-
-The project contains detailed technical documentation for every major component.
-
-| Document | Purpose |
-|----------|---------|
-| `README.md` | Project overview |
-| `SETUP.md` | Installation and execution guide |
-| `docs/project_overview.md` | Business context and objectives |
-| `docs/project_architecture.md` | Pipeline architecture |
-| `docs/project_structure.md` | Repository organization |
-| `docs/data_model.md` | Dimensional model documentation |
-| `docs/data_dictionary.md` | Detailed model reference |
-| `docs/data_audit.md` | Raw versus transformed data audit |
-| `docs/data_quality.md` | Data quality framework |
-
----
-
-# About This Project
-
-This repository was developed as an end-to-end Analytics Engineering case study to demonstrate modern data warehousing practices using publicly available e-commerce data.
-
-The project focuses on designing maintainable data models, implementing modular SQL transformations, orchestrating workflows, validating data quality, and delivering business-ready analytical datasets for reporting.
-
-While the source data originates from the publicly available Olist Brazilian E-Commerce dataset, the architecture, transformation framework, analytical models, documentation, orchestration pipeline, and reporting solution were designed and implemented as part of this project.
-
----
-
-# Connect
-
-**Saswata Ghosh**
-
-Analytics Engineer • Data Analyst
-
-GitHub
-
-```
-https://github.com/Saswataghosh06
-```
-
-LinkedIn
-
-```
-[Add LinkedIn URL]
-```
-
-Portfolio
-
-```
-[Add Portfolio URL]
-```
-
-Email
-
-```
-[Add Email Address]
-```
-
----
-
-# License
-
-This project is licensed under the MIT License.
-
-See the `LICENSE` file for additional information.
-
----
-
-<div align="center">
-
-### Thank you for taking the time to explore this project.
-
-If you have questions, feedback, or would like to discuss the implementation, feel free to connect.
-
-</div>
+<p align="center"><sub>Questions about any specific number, modeling decision, or the EDA behind a claim above — happy to walk through it.</sub></p>
