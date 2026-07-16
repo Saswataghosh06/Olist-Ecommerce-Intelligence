@@ -1,0 +1,19 @@
+version: 2
+
+sources:
+  - name: olist_raw
+    description: "Bronze layer: Raw Olist e-commerce data in Databricks Unity Catalog."
+    database: olist_analytics  # The Unity Catalog name
+    schema: bronze             # The specific schema containing our Delta tables
+    tables:
+      - name: olist_customers_dataset
+        description: "Customer demographic and location data."
+      - name: olist_geolocation_dataset
+      - name: olist_order_items_dataset
+      - name: olist_order_payments_dataset
+      - name: olist_order_reviews_dataset
+      - name: olist_orders_dataset
+        description: "Core order header table. Contains order status and logistics timestamps."
+      - name: olist_products_dataset
+      - name: olist_sellers_dataset
+      - name: product_category_name_translation

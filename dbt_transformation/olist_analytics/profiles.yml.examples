@@ -1,0 +1,20 @@
+olist_analytics:
+  outputs:
+    # The new primary target: Cloud Databricks Warehouse
+    dev:
+      type: databricks
+      schema: silver
+      catalog: olist_analytics
+      host: <YOUR DATABRICKS HOST>
+      http_path: <YOUR DATABRICKS HTTP PATH>
+      token: "{{ env_var('DBT_DATABRICKS_TOKEN') }}"
+      threads: 4
+
+    # Kept as a backup: The local DuckDB target
+    local:
+      type: duckdb
+      path: ../../data/olist_warehouse.db
+      threads: 4
+
+  # This determines which configuration dbt uses by default
+  target: dev

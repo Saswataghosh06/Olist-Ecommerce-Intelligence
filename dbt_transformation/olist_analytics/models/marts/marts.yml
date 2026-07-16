@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: mart_logistics_performance
+    description: "Executive-level view of shipping efficiency, lateness, and CSAT impact."
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+
+  - name: mart_seller_performance
+    description: "Commercial performance dashboard metrics per seller."
+    columns:
+      - name: seller_id
+        tests:
+          - unique
+          - not_null
+
+  - name: mart_customer_rfm
+    description: "Customer segmentation table based on Recency, Frequency, and Monetary value."
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+      - name: customer_segment
+        tests:
+          - accepted_values:
+             arguments:
+              values: ['Active Loyal', 'New Customer', 'Churning Loyal', 'One-Off']

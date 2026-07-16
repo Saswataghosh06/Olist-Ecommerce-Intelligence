@@ -1,0 +1,31 @@
+# --- Virtual Environments ---
+.venv/
+venv/
+env/
+
+# --- dbt files ---
+target/
+dbt_packages/
+dbt_modules/
+*.log
+
+# --- Local Databases ---
+*.db
+*.db-journal
+
+# --- IDE/OS Files ---
+.vscode/
+.DS_Store
+__pycache__/
+.pytest_cache/
+
+# --- Airflow/Docker ---
+airflow-webserver.pid
+airflow-scheduler.pid
+logs/
+
+data/raw/
+
+dbt_transformation/olist_analytics/profiles.yml
+
+.astro/

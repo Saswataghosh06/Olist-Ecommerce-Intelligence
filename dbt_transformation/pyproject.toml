@@ -1,0 +1,10 @@
+[project]
+name = "dbt-transformation"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "dbt-databricks>=1.12.2",
+    "dbt-duckdb>=1.10.1",
+]

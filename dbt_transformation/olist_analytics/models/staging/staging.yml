@@ -1,0 +1,83 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: "Cleaned and standardized order headers."
+    columns:
+      - name: order_id
+        description: "Primary key for the order."
+        tests:
+          - unique
+          - not_null
+      - name: order_status
+        description: "Current status of the order."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['delivered', 'shipped', 'canceled', 'unavailable', 'invoiced', 'processing', 'created', 'approved']
+  
+  - name: stg_order_items
+    description: "Granular order line items. One row per item inside an order."
+    columns:
+      - name: order_item_key
+        description: "Generated MD5 surrogate primary key unique to each line item."
+        tests:
+          - unique
+          - not_null
+      - name: order_id
+        description: "Foreign key linking back to stg_orders."
+        tests:
+          - not_null
+
+  - name: stg_customers
+    description: "Cleaned customer dimension base."
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_products
+    description: "Cleaned product dimension base with handled null categories."
+    columns:
+      - name: product_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_sellers
+    description: "Cleaned seller dimension base."
+    columns:
+      - name: seller_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_order_payments
+    description: "Order payment records."
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+
+  - name: stg_order_reviews
+    description: "Customer reviews and scores."
+    columns:
+      - name: review_id
+        tests:
+          - not_null
+
+  - name: stg_translations
+    description: "Portuguese to English category name translations."
+    columns:
+      - name: category_name_portuguese
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_geolocation
+    description: "Deduplicated zip code coordinates."
+    columns:
+      - name: zip_code
+        tests:
+          - not_null
