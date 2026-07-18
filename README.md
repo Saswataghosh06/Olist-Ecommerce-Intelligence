@@ -122,8 +122,7 @@ A 3-page interactive dashboard built directly on the Gold marts — Overview, Lo
 ### 7.1 The Retention Cliff (RFM Segmentation)
 
 <div align="center">
-<img width="600" src="images/insight_rfm_segments.png" alt="Donut or pie chart showing customer segment share — placeholder, export from Databricks notebook" />
-<br><sub>Suggested chart: donut/pie chart of customer_segment share (One-Off / New Customer), from the RFM notebook cell — placeholder, swap for real export</sub>
+<img width="1093" height="1168" alt="Image" src="https://github.com/user-attachments/assets/6121e957-714c-4642-9983-09cde3fe65c9" />
 </div>
 
 | Segment | Customers | Share |
@@ -137,8 +136,7 @@ Out of 96,478 segmented customers, none currently qualify as repeat buyers. O-Li
 ### 7.2 Delivery Timing Is the Single Clearest Driver of Satisfaction
 
 <div align="center">
-<img width="600" src="images/insight_ontime_vs_late_review.png" alt="Clustered bar chart, on-time vs late average review score — placeholder, export from Databricks notebook" />
-<br><sub>Suggested chart: 2-bar clustered/column chart, Avg Review Score for On-Time vs Late (green vs red) — placeholder, swap for real export</sub>
+<img width="1167" height="1167" alt="Image" src="https://github.com/user-attachments/assets/a20c237c-f101-44ff-9606-501e270b7631" />
 </div>
 
 | Delivery status | Orders | Avg. review score |
@@ -151,8 +149,7 @@ A late delivery costs the platform 1.64 stars on average — nearly two full poi
 ### 7.3 SLA Breach Rate by Customer State — Where Delivery Actually Fails
 
 <div align="center">
-<img width="700" src="images/insight_sla_by_state.png" alt="Horizontal bar chart, SLA breach rate by customer state, worst and best 5 — placeholder, export from Databricks notebook" />
-<br><sub>Suggested chart: horizontal bar chart, SLA breach % by customer_state (worst 5 in red, best 5 in green, or two side-by-side panels) — placeholder, swap for real export</sub>
+<img width="2363" height="1063" alt="Image" src="https://github.com/user-attachments/assets/803b2b27-e3eb-4cbb-b04d-1142a254e304" />
 </div>
 
 **Worst 5 states:**
@@ -180,9 +177,9 @@ All five worst-performing states sit in Brazil's North/Northeast, and their SLA 
 ### 7.4 Seller Concentration Risk — Revenue Says Nothing About Quality
 
 <div align="center">
-<img width="700" src="images/insight_seller_revenue_vs_review.png" alt="Scatter plot, seller revenue vs average review score, bubble size = orders fulfilled — placeholder, export from Databricks notebook" />
-<br><sub>Suggested chart: scatter/bubble plot, total_revenue_generated (x) vs average_customer_review_score (y), bubble size = total_orders_fulfilled, with Seller #1 and #2 labeled — placeholder, swap for real export</sub>
+<img width="1765" height="1266" alt="Image" src="https://github.com/user-attachments/assets/527c58ef-b27d-4824-b774-0cb21726d7c1" />
 </div>
+
 
 | Metric | Seller #1 (4869f7a5…) | Seller #2 (7c67e144…) |
 |---|---:|---:|
@@ -220,12 +217,12 @@ Prioritized the way a real budget cycle would triage them.
 ## 9. Tech Stack, Architecture & Code
 
 <div align="center">
-<img width="900" src="images/architecture_diagram.png" alt="Bronze to Silver to Gold pipeline architecture" />
+<img width="2816" height="793" alt="Image" src="https://github.com/user-attachments/assets/8267a1e6-7660-4475-b400-3f97b081de61" />
 <br><sub>CSV → Databricks Volumes (Bronze) → dbt staging → Silver star schema → Gold marts → Power BI</sub>
 </div>
 
 <div align="center">
-<img width="900" src="images/lineage_graph.png" alt="dbt lineage graph, bronze sources to gold marts" />
+<img width="1297" height="596" alt="Image" src="https://github.com/user-attachments/assets/25cfcf53-d7c4-4358-baa6-eb592638968f" />
 </div>
 
 | Layer | Tool | Notes |
