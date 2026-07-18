@@ -43,6 +43,11 @@ That question touches product, logistics, seller quality, and finance at once, s
 
 Medallion Architecture (Bronze → Silver → Gold) with a star schema in Silver: 4 conformed dimensions, 3 fact tables, feeding 3 Gold marts.
 
+<div align="center">
+<img width="2816" height="793" alt="Image" src="https://github.com/user-attachments/assets/8267a1e6-7660-4475-b400-3f97b081de61" />
+<br><sub>CSV → Databricks Volumes (Bronze) → dbt staging → Silver star schema → Gold marts → Power BI</sub>
+</div>
+
 **Source layer (Bronze):**
 
 | Dataset | Rows | Columns |
@@ -215,11 +220,6 @@ Prioritized the way a real budget cycle would triage them.
 **The through-line:** the biggest lever isn't more acquisition spend — it's fixing a delivery-reliability gap concentrated in five states and a small number of outlier sellers, both of which are currently invisible to any dashboard that stops at revenue.
 
 ## 9. Tech Stack, Architecture & Code
-
-<div align="center">
-<img width="2816" height="793" alt="Image" src="https://github.com/user-attachments/assets/8267a1e6-7660-4475-b400-3f97b081de61" />
-<br><sub>CSV → Databricks Volumes (Bronze) → dbt staging → Silver star schema → Gold marts → Power BI</sub>
-</div>
 
 <div align="center">
 <img width="1297" height="596" alt="Image" src="https://github.com/user-attachments/assets/25cfcf53-d7c4-4358-baa6-eb592638968f" />
