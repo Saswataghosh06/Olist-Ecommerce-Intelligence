@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="140px" src="images/logo.png" alt="Olist E-Commerce Intelligence logo — swap for your own" />
+ <img width="1584" height="396" alt="Image" src="https://github.com/user-attachments/assets/5d2737f2-435d-44b8-9c10-d954e2085e79" />
 </div>
 
 <h1 align="center">Olist E-Commerce Intelligence Platform</h1>
