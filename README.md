@@ -87,15 +87,16 @@ Medallion Architecture (Bronze → Silver → Gold) with a star schema in Silver
 ## 5. Interactive Dashboard
 
 <div align="center">
-<img width="900" src="images/dashboard_overview.png" alt="Overview page — placeholder, swap for real screenshot" />
+<img width="1306" height="643" alt="Image" src="https://github.com/user-attachments/assets/3e27862a-c1c2-4765-b273-b3b42a5b6d30" />
 
 </div>
 <div align="center">
-<img width="900" src="images/dashboard_logistics.png" alt="Logistics & Delivery page — placeholder, swap for real screenshot" />
+<img width="1308" height="644" alt="Image" src="https://github.com/user-attachments/assets/6c9cbfdc-4867-4a2c-b16c-904d04a9c989" />
+
 
 </div>
 <div align="center">
-<img width="900" src="images/dashboard_seller.png" alt="Seller & Retention page — placeholder, swap for real screenshot" />
+<img width="1306" height="644" alt="Image" src="https://github.com/user-attachments/assets/5b9e3ae1-98c8-449e-9cb6-a4cc95f1712f" />
 
 </div>
 
