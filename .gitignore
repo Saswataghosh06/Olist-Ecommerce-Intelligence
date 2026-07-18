@@ -29,3 +29,5 @@ data/raw/
 dbt_transformation/olist_analytics/profiles.yml
 
 .astro/
+
+images/
