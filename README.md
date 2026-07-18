@@ -57,7 +57,7 @@ Medallion Architecture (Bronze → Silver → Gold) with a star schema in Silver
 | olist_sellers_dataset | 3,095 | 4 |
 | product_category_name_translation | 71 | 2 |
 
-**Gold-layer entity counts (verified directly from mart exports):**
+**Gold-layer entity counts (verified directly from mart exports, de-duplicated to one row per unique order):**
 
 | Entity | Count |
 |---|---:|
@@ -65,8 +65,8 @@ Medallion Architecture (Bronze → Silver → Gold) with a star schema in Silver
 | Order-line rows (`fct_order_items`, multi-seller orders create extra rows) | 100,785 |
 | Unique sellers (`mart_seller_performance`) | 3,095 |
 | Customers segmented in RFM (`mart_customer_rfm`) | 96,478 |
-| Delivered orders | 97,819 (97.1%) |
-| Orders with a missing review score | 782 |
+| Delivered orders | 96,478 (97.02%) |
+| Orders with a missing review score | 768 |
 
 **Data quality resolutions applied in staging** (full detail in `docs/data_audit.md`):
 
@@ -79,27 +79,52 @@ Medallion Architecture (Bronze → Silver → Gold) with a star schema in Silver
 | Geolocation — duplicate ZIP rows | Resolved via `AVG(lat/lng)` grouped by ZIP |
 | Review text sparsity | 88.34% null on title/message; numeric scores 100% complete |
 
-## 5. Executive Summary
+## 5. Interactive Dashboard
+
+<div align="center">
+<img width="900" src="images/dashboard_overview.png" alt="Overview page — placeholder, swap for real screenshot" />
+<br><sub>Overview — placeholder screenshot, to be replaced</sub>
+</div>
+<div align="center">
+<img width="900" src="images/dashboard_logistics.png" alt="Logistics & Delivery page — placeholder, swap for real screenshot" />
+<br><sub>Logistics & Delivery — placeholder screenshot, to be replaced</sub>
+</div>
+<div align="center">
+<img width="900" src="images/dashboard_seller.png" alt="Seller & Retention page — placeholder, swap for real screenshot" />
+<br><sub>Seller & Retention — placeholder screenshot, to be replaced</sub>
+</div>
+
+A 3-page interactive dashboard built directly on the Gold marts — Overview, Logistics & Delivery, and Seller & Retention — with cross-filtering by customer state, order status, and customer segment, plus an independent seller-state filter on the retention page. Every KPI on it traces back to the exact numbers in Section 6 below; nothing on the dashboard is a separately-sourced or re-estimated figure.
+
+## 6. Executive Summary
 
 | Metric | Value |
 |---|---:|
-| Total platform revenue | $15,843,553.24 |
+| Total platform revenue (seller mart) | $15,843,553.24 |
+| Total order payments (logistics mart, order-level) | $16,008,872.12 |
 | Total freight collected | $2,251,909.54 |
 | Total product revenue | $13,591,643.70 |
-| Average order value | $162.37 |
+| Average order value | $160.99 |
 | One-off customers (never returned) | 77,737 (80.57%) |
 | Repeat / VIP customers | 0 (0%) |
-| Platform-wide SLA breach rate | 7.78% |
-| Review score — on-time deliveries | 4.20 ★ (avg. of 92,324 orders) |
-| Review score — late deliveries | 2.57 ★ (avg. of 7,679 orders) |
+| Platform-wide SLA breach rate | 7.87% |
+| Review score — on-time deliveries | 4.21 ★ (avg. of 91,011 reviewed orders) |
+| Review score — late deliveries | 2.57 ★ (avg. of 7,662 reviewed orders) |
 | Revenue ↔ review-score correlation (seller level) | 0.0206 (effectively none) |
 | Freight ↔ review-score correlation (seller level) | -0.0759 (weak) |
 
-**Headline finding:** O-List doesn't have a demand problem, it has a delivery problem. When a delivery arrives on time, customers leave a 4.20-star review on average. When it's late, that collapses to 2.57. Late deliveries hit 7.78% of all orders platform-wide — and 8 in 10 customers never place a second order. Revenue and seller quality are statistically almost unrelated (0.0206 correlation), which means the platform's leaderboard is structurally blind to sellers who generate real revenue while quietly destroying retention.
+*Revenue reconciliation: the seller mart's total revenue ($15,843,553.24) and the logistics mart's total order payments ($16,008,872.12) differ by ~1.03%. Both are correctly computed from their respective source tables — the gap likely reflects the payments table (which includes installments/vouchers) computing revenue on a slightly different basis than the order-items table (price + freight). Neither figure has been adjusted to match the other.*
 
-## 6. Insights Deep Dive
+**Headline finding:** O-List doesn't have a demand problem, it has a delivery problem. When a delivery arrives on time, customers leave a 4.21-star review on average. When it's late, that collapses to 2.57. Late deliveries hit 7.87% of all orders platform-wide — and 8 in 10 customers never place a second order. Revenue and seller quality are statistically almost unrelated (0.0206 correlation), which means the platform's leaderboard is structurally blind to sellers who generate real revenue while quietly destroying retention.
 
-### 6.1 The Retention Cliff (RFM Segmentation)
+## 7. Insights Deep Dive
+
+### 7.1 The Retention Cliff (RFM Segmentation)
+
+<div align="center">
+<img width="600" src="images/insight_rfm_segments.png" alt="Donut or pie chart showing customer segment share — placeholder, export from Databricks notebook" />
+<br><sub>Suggested chart: donut/pie chart of customer_segment share (One-Off / New Customer), from the RFM notebook cell — placeholder, swap for real export</sub>
+</div>
 
 | Segment | Customers | Share |
 |---|---:|---:|
@@ -109,40 +134,55 @@ Medallion Architecture (Bronze → Silver → Gold) with a star schema in Silver
 
 Out of 96,478 segmented customers, none currently qualify as repeat buyers. O-List's acquisition engine works; nothing downstream of the first order is bringing anyone back.
 
-### 6.2 Delivery Timing Is the Single Clearest Driver of Satisfaction
+### 7.2 Delivery Timing Is the Single Clearest Driver of Satisfaction
+
+<div align="center">
+<img width="600" src="images/insight_ontime_vs_late_review.png" alt="Clustered bar chart, on-time vs late average review score — placeholder, export from Databricks notebook" />
+<br><sub>Suggested chart: 2-bar clustered/column chart, Avg Review Score for On-Time vs Late (green vs red) — placeholder, swap for real export</sub>
+</div>
 
 | Delivery status | Orders | Avg. review score |
 |---|---:|---:|
-| On-time | 92,324 | 4.20 ★ |
-| Late | 7,679 | 2.57 ★ |
+| On-time | 91,614 | 4.21 ★ |
+| Late | 7,827 | 2.57 ★ |
 
-A late delivery costs the platform 1.63 stars on average — nearly two full points on a 5-point scale. Platform-wide, **7.78%** of all orders breach their estimated delivery date.
+A late delivery costs the platform 1.64 stars on average — nearly two full points on a 5-point scale. Platform-wide, **7.87%** of all orders breach their estimated delivery date (8.11% measured against delivered orders only — see Section 9 for which denominator is used where).
 
-### 6.3 SLA Breach Rate by Customer State — Where Delivery Actually Fails
+### 7.3 SLA Breach Rate by Customer State — Where Delivery Actually Fails
+
+<div align="center">
+<img width="700" src="images/insight_sla_by_state.png" alt="Horizontal bar chart, SLA breach rate by customer state, worst and best 5 — placeholder, export from Databricks notebook" />
+<br><sub>Suggested chart: horizontal bar chart, SLA breach % by customer_state (worst 5 in red, best 5 in green, or two side-by-side panels) — placeholder, swap for real export</sub>
+</div>
 
 **Worst 5 states:**
 
 | State | Orders | SLA Breach Rate | Avg. Review Score |
 |---|---:|---:|---:|
-| AL — Alagoas | 415 | 22.89% | 3.76 |
-| MA — Maranhão | 759 | 18.71% | 3.74 |
-| PI — Piauí | 497 | 15.29% | 3.91 |
-| CE — Ceará | 1,347 | 14.55% | 3.85 |
-| SE — Sergipe | 353 | 14.45% | 3.80 |
+| AL — Alagoas | 413 | 23.00% | 3.76 |
+| MA — Maranhão | 747 | 18.88% | 3.76 |
+| PI — Piauí | 495 | 15.35% | 3.92 |
+| CE — Ceará | 1,336 | 14.67% | 3.85 |
+| SE — Sergipe | 350 | 14.57% | 3.81 |
 
 **Best 5 states:**
 
 | State | Orders | SLA Breach Rate | Avg. Review Score |
 |---|---:|---:|---:|
-| RO — Rondônia | 256 | 2.73% | 4.04 |
+| RO — Rondônia | 253 | 2.77% | 4.05 |
 | AC — Acre | 81 | 3.70% | 4.05 |
 | AM — Amazonas | 148 | 4.05% | 4.21 |
 | AP — Amapá | 68 | 4.41% | 4.19 |
-| PR — Paraná | 5,109 | 4.82% | 4.16 |
+| PR — Paraná | 5,045 | 4.88% | 4.18 |
 
-All five worst-performing states sit in Brazil's North/Northeast, and their SLA breach rates run 3–8× higher than the best-performing states. This lines up directly with Section 6.2 — states with the worst delivery reliability also carry visibly lower average review scores.
+All five worst-performing states sit in Brazil's North/Northeast, and their SLA breach rates run 4–8× higher than the best-performing states. This lines up directly with Section 7.2 — states with the worst delivery reliability also carry visibly lower average review scores.
 
-### 6.4 Seller Concentration Risk — Revenue Says Nothing About Quality
+### 7.4 Seller Concentration Risk — Revenue Says Nothing About Quality
+
+<div align="center">
+<img width="700" src="images/insight_seller_revenue_vs_review.png" alt="Scatter plot, seller revenue vs average review score, bubble size = orders fulfilled — placeholder, export from Databricks notebook" />
+<br><sub>Suggested chart: scatter/bubble plot, total_revenue_generated (x) vs average_customer_review_score (y), bubble size = total_orders_fulfilled, with Seller #1 and #2 labeled — placeholder, swap for real export</sub>
+</div>
 
 | Metric | Seller #1 (4869f7a5…) | Seller #2 (7c67e144…) |
 |---|---:|---:|
@@ -155,32 +195,29 @@ O-List's #2 seller by revenue is nearly tied with #1 in dollar terms but carries
 
 *Freight comparison note: Seller #1's freight/order ($17.82) is the closest "typical top-seller" figure in this dataset — treat it as an approximate benchmark, not a formal average across the full top-5 cohort, since freight per order varies by product category and weight.*
 
-### 6.5 Freight and Dissatisfaction Are Weakly Linked at the Portfolio Level, Strongly Linked at the Outlier Level
+### 7.5 Freight and Dissatisfaction Are Weakly Linked at the Portfolio Level, Strongly Linked at the Outlier Level
 
 Portfolio-wide, the correlation between a seller's freight-per-order and their average review score is **-0.0759** — weak, on its own not a strong signal. But Seller #2 sits at the extreme end of both axes simultaneously: 3× the freight of comparable top sellers, and the lowest review score in the top-5 revenue cohort. The weak aggregate correlation doesn't rule out concentrated damage from specific outlier sellers — it just means the effect doesn't show up until you segment.
 
-## 7. Recommendations
+## 8. Recommendations
 
 Prioritized the way a real budget cycle would triage them.
 
-**Do first — low effort, high impact**
-- Flag and review any high-volume seller whose average review score drops below 3.5, regardless of revenue rank (directly catches sellers like #2)
-- Launch a post-purchase retention flow (second-order discount, loyalty nudge) targeted at the 77,737 One-Off segment
-- Audit freight pricing on outlier sellers whose freight/order sits multiples above comparable peers
-
-**Next — bigger lift, still high value**
-- Investigate root cause of delivery failure in AL, MA, PI, CE, and SE specifically — carrier assignment, warehouse distance, and last-mile partner coverage in these states
-- Build a seller scorecard combining review score, SLA performance, and freight ratio — not revenue alone — into internal seller rankings
-- Track RFM segmentation as a rolling monthly metric so retention becomes a visible, owned KPI
-
-**Longer horizon**
-- Pilot regional carrier partnerships for the Northeast, where national-flat-rate logistics is clearly underperforming
-- Re-run this freight-by-geography analysis once order-item-level freight data (split by customer state) is available, to confirm or refute the cost side of the Northeast pattern with full precision
-- Build automated seller probation triggers tied to the review/revenue divergence identified in 6.4
+| Priority | Recommendation | Why |
+|---|---|---|
+| Do first | Flag and review any high-volume seller whose average review score drops below 3.5, regardless of revenue rank | Directly catches sellers like Seller #2 (Section 7.4) |
+| Do first | Launch a post-purchase retention flow (second-order discount, loyalty nudge) targeted at the 77,737 One-Off segment | Addresses the 80.57% retention cliff (Section 7.1) |
+| Do first | Audit freight pricing on outlier sellers whose freight/order sits multiples above comparable peers | Seller #2 charges 3× the benchmark freight/order (Section 7.4) |
+| Next | Investigate root cause of delivery failure in AL, MA, PI, CE, and SE specifically — carrier assignment, warehouse distance, last-mile coverage | These 5 states run 4–8× the best-performing states' breach rate (Section 7.3) |
+| Next | Build a seller scorecard combining review score, SLA performance, and freight ratio — not revenue alone — into internal seller rankings | Revenue tells you nothing about seller quality (0.0206 correlation, Section 7.4) |
+| Next | Track RFM segmentation as a rolling monthly metric so retention becomes a visible, owned KPI | Currently a one-time snapshot (Section 9) |
+| Longer horizon | Pilot regional carrier partnerships for the Northeast | National-flat-rate logistics is clearly underperforming there |
+| Longer horizon | Re-run freight-by-geography analysis once order-item-level freight data (split by customer state) is available | Confirms or refutes the cost side of the Northeast pattern with full precision |
+| Longer horizon | Build automated seller probation triggers tied to the review/revenue divergence in 7.4 | Turns a manual audit into a standing process |
 
 **The through-line:** the biggest lever isn't more acquisition spend — it's fixing a delivery-reliability gap concentrated in five states and a small number of outlier sellers, both of which are currently invisible to any dashboard that stops at revenue.
 
-## 8. Tech Stack, Architecture & Code
+## 9. Tech Stack, Architecture & Code
 
 <div align="center">
 <img width="900" src="images/architecture_diagram.png" alt="Bronze to Silver to Gold pipeline architecture" />
@@ -199,7 +236,7 @@ Prioritized the way a real budget cycle would triage them.
 | Orchestration | Apache Airflow | `dbt_debug` → `dbt_build` DAG |
 | Governance | dbt schema tests | `unique`, `not_null`, `accepted_values`, `relationships` |
 | Business EDA | Databricks notebook (SQL/Python) | RFM, correlation analysis, and SLA breakdowns run before any dashboard was built |
-| Reporting | Power BI | Built on top of the Gold marts |
+| Reporting | Interactive HTML/JS dashboard + Power BI | Built on top of the Gold marts; see Section 5 |
 
 **Repository structure:**
 
@@ -230,13 +267,15 @@ Olist-Ecommerce-Intelligence/
 | [`docs/project_structure.md`](./docs/project_structure.md) | Repository layout and folder responsibilities |
 | [`docs/project_architecture.md`](./docs/project_architecture.md) | Pipeline architecture and Airflow DAG design |
 
-## 9. Caveats & Assumptions
+## 10. Caveats & Assumptions
 
 - **This is real, historical data (2016–2018)**, not synthetic. It reflects Olist's operating conditions in that window, not current-day performance.
-- **The RFM denominator (96,478) is smaller than total unique customers in the order fact (99,441).** This is expected — RFM segmentation excludes customers whose only orders were canceled or unavailable, per the mart's own logic — but it's worth stating plainly rather than treating the two counts as interchangeable.
-- **State-level freight-only figures are not included in this version.** The available exports split freight by seller, not by customer state, so a per-state freight table couldn't be verified against the source data. The SLA-breach-by-state table (Section 6.3) is fully verified and carries the geographic argument in its place.
-- **Correlation is not causation.** The revenue-review (0.0206) and freight-review (-0.0759) figures are weak at the full-portfolio level; the outlier pattern in Section 6.5 is a segmented finding, not a platform-wide statistical relationship.
-- **SLA breach rate (7.78%) is computed across all orders**, including non-delivered ones (canceled, unavailable, etc.), which are not flagged late. Measured only against delivered orders, the rate is 8.02% — both are defensible; this README uses the all-orders figure for consistency with the original notebook analysis.
+- **The logistics mart is at the order-line grain, not the order grain** (100,785 rows for 99,441 unique orders — multi-seller orders repeat). Every figure in this README is computed after de-duplicating to one row per unique `order_id`; a naive sum/mean on the raw export would overstate revenue by ~2.2% and understate the SLA breach rate by roughly 0.1 percentage point.
+- **The RFM denominator (96,478) is smaller than total unique customers in the order fact (99,441).** This is expected — RFM segmentation excludes customers whose only orders were canceled or unavailable, per the mart's own logic — but it's worth stating plainly rather than treating the two counts as interchangeable. Note this also happens to match the corrected delivered-order count (96,478) exactly; this is coincidental, not the same underlying figure.
+- **State-level freight-only figures are not included in this version.** The available exports split freight by seller, not by customer state, so a per-state freight table couldn't be verified against the source data. The SLA-breach-by-state table (Section 7.3) is fully verified and carries the geographic argument in its place.
+- **Correlation is not causation.** The revenue-review (0.0206) and freight-review (-0.0759) figures are weak at the full-portfolio level; the outlier pattern in Section 7.5 is a segmented finding, not a platform-wide statistical relationship.
+- **SLA breach rate (7.87%) is computed across all orders**, including non-delivered ones (canceled, unavailable, etc.), which are not flagged late. Measured only against delivered orders, the rate is 8.11% — both are defensible; this README uses the all-orders figure for consistency with the original notebook analysis.
+- **Two valid, differently-sourced revenue totals exist** ($15,843,553.24 from the seller mart vs. $16,008,872.12 from the logistics mart) — see the reconciliation note under Section 6. Neither has been forced to match the other.
 - **This reflects one analysis pass on a static dataset.** A production version would track SLA breach and RFM segmentation as rolling metrics, not a single snapshot.
 
 ---
