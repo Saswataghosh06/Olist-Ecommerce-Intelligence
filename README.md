@@ -88,15 +88,15 @@ Medallion Architecture (Bronze → Silver → Gold) with a star schema in Silver
 
 <div align="center">
 <img width="900" src="images/dashboard_overview.png" alt="Overview page — placeholder, swap for real screenshot" />
-<br><sub>Overview — placeholder screenshot, to be replaced</sub>
+
 </div>
 <div align="center">
 <img width="900" src="images/dashboard_logistics.png" alt="Logistics & Delivery page — placeholder, swap for real screenshot" />
-<br><sub>Logistics & Delivery — placeholder screenshot, to be replaced</sub>
+
 </div>
 <div align="center">
 <img width="900" src="images/dashboard_seller.png" alt="Seller & Retention page — placeholder, swap for real screenshot" />
-<br><sub>Seller & Retention — placeholder screenshot, to be replaced</sub>
+
 </div>
 
 A 3-page interactive dashboard built directly on the Gold marts — Overview, Logistics & Delivery, and Seller & Retention — with cross-filtering by customer state, order status, and customer segment, plus an independent seller-state filter on the retention page. Every KPI on it traces back to the exact numbers in Section 6 below; nothing on the dashboard is a separately-sourced or re-estimated figure.
@@ -127,7 +127,7 @@ A 3-page interactive dashboard built directly on the Gold marts — Overview, Lo
 ### 7.1 The Retention Cliff (RFM Segmentation)
 
 <div align="center">
-<img width="1093" height="1168" alt="Image" src="https://github.com/user-attachments/assets/6121e957-714c-4642-9983-09cde3fe65c9" />
+<img width="50%" alt="Image" src="https://github.com/user-attachments/assets/6121e957-714c-4642-9983-09cde3fe65c9" />
 </div>
 
 | Segment | Customers | Share |
@@ -141,7 +141,7 @@ Out of 96,478 segmented customers, none currently qualify as repeat buyers. O-Li
 ### 7.2 Delivery Timing Is the Single Clearest Driver of Satisfaction
 
 <div align="center">
-<img width="1167" height="1167" alt="Image" src="https://github.com/user-attachments/assets/a20c237c-f101-44ff-9606-501e270b7631" />
+<img width="50%" alt="Image" src="https://github.com/user-attachments/assets/a20c237c-f101-44ff-9606-501e270b7631" />
 </div>
 
 | Delivery status | Orders | Avg. review score |
@@ -154,7 +154,7 @@ A late delivery costs the platform 1.64 stars on average — nearly two full poi
 ### 7.3 SLA Breach Rate by Customer State — Where Delivery Actually Fails
 
 <div align="center">
-<img width="2363" height="1063" alt="Image" src="https://github.com/user-attachments/assets/803b2b27-e3eb-4cbb-b04d-1142a254e304" />
+<img width="70%" alt="Image" src="https://github.com/user-attachments/assets/803b2b27-e3eb-4cbb-b04d-1142a254e304" />
 </div>
 
 **Worst 5 states:**
@@ -182,7 +182,7 @@ All five worst-performing states sit in Brazil's North/Northeast, and their SLA 
 ### 7.4 Seller Concentration Risk — Revenue Says Nothing About Quality
 
 <div align="center">
-<img width="1765" height="1266" alt="Image" src="https://github.com/user-attachments/assets/527c58ef-b27d-4824-b774-0cb21726d7c1" />
+<img width="70%" alt="Image" src="https://github.com/user-attachments/assets/527c58ef-b27d-4824-b774-0cb21726d7c1" />
 </div>
 
 
