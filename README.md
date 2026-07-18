@@ -13,7 +13,7 @@
 </p>
 
 <p align="center"><b>Saswata Ghosh</b> · Data Analyst / Analytics Engineer<br>
-<a href="https://github.com/Saswataghosh06/Olist-Ecommerce-Intelligence">GitHub Repo</a> · <a href="#">LinkedIn</a> · <a href="#">Email</a></p>
+<a href="https://github.com/Saswataghosh06/Olist-Ecommerce-Intelligence">GitHub Repo</a> · <a href="https://www.linkedin.com/in/saswata-ghosh06/">LinkedIn</a> · <a href="saswataghosh2022@gmail.com">Email</a></p>
 
 ---
 
@@ -266,7 +266,6 @@ Olist-Ecommerce-Intelligence/
 
 ## 10. Caveats & Assumptions
 
-- **This is real, historical data (2016–2018)**, not synthetic. It reflects Olist's operating conditions in that window, not current-day performance.
 - **The logistics mart is at the order-line grain, not the order grain** (100,785 rows for 99,441 unique orders — multi-seller orders repeat). Every figure in this README is computed after de-duplicating to one row per unique `order_id`; a naive sum/mean on the raw export would overstate revenue by ~2.2% and understate the SLA breach rate by roughly 0.1 percentage point.
 - **The RFM denominator (96,478) is smaller than total unique customers in the order fact (99,441).** This is expected — RFM segmentation excludes customers whose only orders were canceled or unavailable, per the mart's own logic — but it's worth stating plainly rather than treating the two counts as interchangeable. Note this also happens to match the corrected delivered-order count (96,478) exactly; this is coincidental, not the same underlying figure.
 - **State-level freight-only figures are not included in this version.** The available exports split freight by seller, not by customer state, so a per-state freight table couldn't be verified against the source data. The SLA-breach-by-state table (Section 7.3) is fully verified and carries the geographic argument in its place.
