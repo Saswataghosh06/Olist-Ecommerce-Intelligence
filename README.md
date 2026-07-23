@@ -12,7 +12,7 @@
   <img alt="scale" src="https://img.shields.io/badge/orders-99441_%7C_sellers-3095-12A879">
 </p>
 
-<p align="center"><b>Saswata Ghosh</b> · Data Analyst / Analytics Engineer<br>
+<p align="center"><b>Saswata Ghosh</b>
 <a href="https://github.com/Saswataghosh06/Olist-Ecommerce-Intelligence">GitHub Repo</a> · <a href="https://www.linkedin.com/in/saswata-ghosh06/">LinkedIn</a> · <a href="saswataghosh2022@gmail.com">Email</a></p>
 
 ---
